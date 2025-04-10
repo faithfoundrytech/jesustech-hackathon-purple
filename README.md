@@ -6,20 +6,34 @@ Welcome to our open-source project built during the **Jesus Tech Hackathon**. Th
 
 ## 📌 Problem Statement
 
-**Title**: [Insert problem name – e.g., LMS for Youth Leader Training]  
+**Title**: Jesus Tech Index  
 **Problem Summary**:  
-> Briefly describe the problem you're solving and why it's important (2–3 sentences).
+> We need an engaging, centralized AI-powered directory platform for discovering, showcasing, and sharing faith-oriented technology solutions, products, and services specifically serving the Jesus tech ecosystem in Africa. .
 
 ---
 
 ## 🎯 Goal
 
 Outline what you aim to deliver during the hackathon – your MVP scope. Example:
+For Users:
 
-- User registration & login
-- Course delivery (2 sample modules)
-- Quiz functionality
-- Progress tracking
+- Quickly discover and access innovative faith-based tech solutions.
+
+- Easily share new Jesus tech products with a community of believers, technologists, churches, and faith-driven entrepreneurs.
+
+- Build stronger community engagement and visibility within the Jesus tech ecosystem.
+
+For Product Creators:
+
+- Provide a clear platform for visibility, feedback, and validation of their solutions.
+
+- Facilitate community-driven discovery to accelerate growth and adoption.
+
+For Church Leaders & Organizations:
+
+- Simplify sourcing and adoption of tech solutions specifically tailored to faith-based needs.
+
+- Foster collaboration and strategic partnerships within the ecosystem.
 
 ---
 
@@ -35,11 +49,11 @@ Outline what you aim to deliver during the hackathon – your MVP scope. Example
 
 | Layer         | Tech Used                |
 |---------------|--------------------------|
-| Frontend      | React / Next.js          |
-| Backend       | Node.js / FastAPI        |
-| Database      | Supabase / MongoDB       |
-| AI / NLP      | OpenAI API / LangChain   |
-| Deployment    | Vercel / Railway         |
+| Frontend      | Next.js                  |
+| Backend       | Next.js                  |
+| Database      | MongoDB                  |
+| AI / NLP      | LangChain                |
+| Deployment    | Vercel                   |
 
 ---
 
@@ -50,17 +64,17 @@ Outline what you aim to deliver during the hackathon – your MVP scope. Example
 git clone https://github.com/jesustech/jesustech-hackathon-[color].git
 
 # 2. Install dependencies
-npm install
+yarn install
 
 # 3. Run locally
-npm run dev
+yarn dev
 ```
 
 ---
 
 ## 🌍 Live Demo
 
-Hosted on: [Insert Vercel/Render URL here]  
+Hosted on: [Insert Vercel]  
 Demo credentials (if needed):  
 - Username: demo@example.com  
 - Password: password123  

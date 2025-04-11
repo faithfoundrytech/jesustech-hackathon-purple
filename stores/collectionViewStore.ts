@@ -14,7 +14,7 @@ interface Product {
 }
 
 interface CollectionViewState {
-  products: Product[]
+  products: Product[] | null
   selectedProduct: Product | null
   isLoadingProducts: boolean
   pagination: {
@@ -39,7 +39,7 @@ interface CollectionViewState {
 }
 
 const useCollectionViewStore = create<CollectionViewState>((set, get) => ({
-  products: [],
+  products: null,
   selectedProduct: null,
   isLoadingProducts: false,
   pagination: null,

@@ -167,7 +167,8 @@ export function ProductSearch() {
       </div>
 
       {/* Search Results */}
-      {(showResults || selectedCategories.length > 0) && (
+      {((showResults && searchTerm.trim() !== '') ||
+        selectedCategories.length > 0) && (
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
           <div className='bg-white rounded-lg shadow-md overflow-hidden'>
             <div className='px-4 py-5 sm:px-6 border-b border-gray-200'>

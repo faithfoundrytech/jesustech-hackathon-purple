@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import useCollectionViewStore from '@/stores/collectionViewStore'
+import { ProductChat } from '@/components/productChat'
 
 export default function Home() {
   const { products, isLoadingProducts, getProducts, refreshProducts } =
@@ -17,6 +18,9 @@ export default function Home() {
     <div className='min-h-screen p-8'>
       <div className='max-w-7xl mx-auto'>
         <div className='flex justify-between items-center mb-6'>
+          <div className='flex items-end gap-2'>
+            <ProductChat />
+          </div>
           <h1 className='text-2xl font-bold'>Products</h1>
           <button
             onClick={refreshProducts}

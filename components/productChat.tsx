@@ -9,6 +9,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { ArrowUp, Paperclip, Square, X } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
+import Markdown from 'react-markdown'
 
 interface Message {
   id: string
@@ -185,7 +188,8 @@ export function ProductChat() {
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-100'
                   }`}>
-                  {message.content}
+                 <Markdown>{message.content}</Markdown>
+
                 </div>
               </div>
             ))}

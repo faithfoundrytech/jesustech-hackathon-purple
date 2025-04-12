@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import useCollectionViewStore from '@/stores/collectionViewStore'
+import { ProductChat } from '@/components/productChat'
 
 export default function Home() {
   const { products, isLoadingProducts, getProducts, refreshProducts } = useCollectionViewStore()
@@ -56,6 +57,9 @@ export default function Home() {
   return (
     <div className='min-h-screen p-8'>
       <div className='max-w-7xl mx-auto'>
+        <div className='flex items-end gap-2'>
+            <ProductChat />
+          </div>
         <div className='mb-6'>
           <h1 className='text-3xl font-bold mb-6'>Products</h1>
           

@@ -155,15 +155,15 @@ export function ProductSearch() {
           {/* Action Buttons */}
           <div className='flex justify-center gap-4 mt-8'>
             <Button
-              onClick={() => router.push('/#categories')}
+              onClick={() => router.push('/submit-product')}
               className='bg-primary text-white px-8'>
-              Browse Categories
+              Submit Your Product
             </Button>
             <Button
-              onClick={() => router.push('/submit-product')}
+              onClick={() => router.push('/submit-problem')}
               variant='outline'
               className='border-primary text-primary hover:bg-primary hover:text-white'>
-              Submit Your Product
+              Submit Your Problem
             </Button>
           </div>
         </div>

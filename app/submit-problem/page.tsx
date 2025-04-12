@@ -3,30 +3,26 @@
 import { useState, KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
 
-interface ProductFormData {
+interface ProblemFormData {
   name: string
+  email: string
   country: string
-  category: string[]
+  ministry?: string
+  categories: string[]
   description: string
-  website: string
-  logo?: string
-  submitterName: string
-  submitterEmail: string
 }
 
-export default function SubmitProduct() {
+export default function SubmitProblem() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentCategory, setCurrentCategory] = useState('')
-  const [formData, setFormData] = useState<ProductFormData>({
+  const [formData, setFormData] = useState<ProblemFormData>({
     name: '',
+    email: '',
     country: '',
-    category: [],
+    ministry: '',
+    categories: [],
     description: '',
-    website: '',
-    logo: '',
-    submitterName: '',
-    submitterEmail: '',
   })
 
   // TODO: Implement form submission
@@ -34,12 +30,12 @@ export default function SubmitProduct() {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      // TODO: Add API call to submit product
-      console.log('Submitting product:', formData)
+      // TODO: Add API call to submit problem
+      console.log('Submitting problem:', formData)
       // TODO: Add success handling
     } catch (error) {
       // TODO: Add error handling
-      console.error('Error submitting product:', error)
+      console.error('Error submitting problem:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -55,11 +51,11 @@ export default function SubmitProduct() {
   const handleAddCategory = () => {
     if (
       currentCategory.trim() &&
-      !formData.category.includes(currentCategory.trim())
+      !formData.categories.includes(currentCategory.trim())
     ) {
       setFormData((prev) => ({
         ...prev,
-        category: [...prev.category, currentCategory.trim()],
+        categories: [...prev.categories, currentCategory.trim()],
       }))
       setCurrentCategory('')
     }
@@ -75,7 +71,7 @@ export default function SubmitProduct() {
   const removeCategory = (categoryToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      category: prev.category.filter((cat) => cat !== categoryToRemove),
+      categories: prev.categories.filter((cat) => cat !== categoryToRemove),
     }))
   }
 
@@ -98,14 +94,26 @@ export default function SubmitProduct() {
         Back
       </button>
 
-      <h1 className='text-3xl font-bold mb-8'>Submit a Product</h1>
+      <h1 className='text-3xl font-bold mb-8'>Submit a Problem</h1>
       <form onSubmit={handleSubmit} className='space-y-6'>
         <div>
-          <label className='block text-sm font-medium mb-2'>Product Name</label>
+          <label className='block text-sm font-medium mb-2'>Your Name</label>
           <input
             type='text'
             name='name'
             value={formData.name}
+            onChange={handleChange}
+            required
+            className='w-full p-2 border rounded'
+          />
+        </div>
+
+        <div>
+          <label className='block text-sm font-medium mb-2'>Email</label>
+          <input
+            type='email'
+            name='email'
+            value={formData.email}
             onChange={handleChange}
             required
             className='w-full p-2 border rounded'
@@ -120,6 +128,19 @@ export default function SubmitProduct() {
             value={formData.country}
             onChange={handleChange}
             required
+            className='w-full p-2 border rounded'
+          />
+        </div>
+
+        <div>
+          <label className='block text-sm font-medium mb-2'>
+            Ministry (optional)
+          </label>
+          <input
+            type='text'
+            name='ministry'
+            value={formData.ministry}
+            onChange={handleChange}
             className='w-full p-2 border rounded'
           />
         </div>
@@ -143,7 +164,7 @@ export default function SubmitProduct() {
             </button>
           </div>
           <div className='flex flex-wrap gap-2'>
-            {formData.category.map((category) => (
+            {formData.categories.map((category) => (
               <div
                 key={category}
                 className='flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full'>
@@ -160,62 +181,15 @@ export default function SubmitProduct() {
         </div>
 
         <div>
-          <label className='block text-sm font-medium mb-2'>Description</label>
+          <label className='block text-sm font-medium mb-2'>
+            Problem Description
+          </label>
           <textarea
             name='description'
             value={formData.description}
             onChange={handleChange}
             required
-            rows={4}
-            className='w-full p-2 border rounded'
-          />
-        </div>
-
-        <div>
-          <label className='block text-sm font-medium mb-2'>Website URL</label>
-          <input
-            type='url'
-            name='website'
-            value={formData.website}
-            onChange={handleChange}
-            required
-            className='w-full p-2 border rounded'
-          />
-        </div>
-
-        <div>
-          <label className='block text-sm font-medium mb-2'>
-            Logo URL (optional)
-          </label>
-          <input
-            type='url'
-            name='logo'
-            value={formData.logo}
-            onChange={handleChange}
-            className='w-full p-2 border rounded'
-          />
-        </div>
-
-        <div>
-          <label className='block text-sm font-medium mb-2'>Your Name</label>
-          <input
-            type='text'
-            name='submitterName'
-            value={formData.submitterName}
-            onChange={handleChange}
-            required
-            className='w-full p-2 border rounded'
-          />
-        </div>
-
-        <div>
-          <label className='block text-sm font-medium mb-2'>Your Email</label>
-          <input
-            type='email'
-            name='submitterEmail'
-            value={formData.submitterEmail}
-            onChange={handleChange}
-            required
+            rows={6}
             className='w-full p-2 border rounded'
           />
         </div>
@@ -224,7 +198,7 @@ export default function SubmitProduct() {
           type='submit'
           disabled={isSubmitting}
           className='w-full bg-primary text-white py-2 px-4 rounded hover:bg-primary/90 disabled:opacity-50'>
-          {isSubmitting ? 'Submitting...' : 'Submit Product'}
+          {isSubmitting ? 'Submitting...' : 'Submit Problem'}
         </button>
       </form>
     </div>

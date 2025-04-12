@@ -31,6 +31,7 @@ export async function POST(request: Request) {
           : [product.category],
         description: product.description,
         website: product.website,
+        logo: product.logo || null,
       }
     }
 

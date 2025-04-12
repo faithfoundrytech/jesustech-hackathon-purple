@@ -29,16 +29,22 @@ export function FeaturedProducts() {
   const fetchFeaturedProducts = async (pageNum: number) => {
     try {
       setLoading(true)
-      const response = await fetch(
-        `/api/featured/list?page=${pageNum}&limit=10`
-      )
+      const response = await fetch(`/api/featured/list?page=1&limit=10`)
       const data = await response.json()
 
       if (!data.success) {
         throw new Error('Failed to fetch featured products')
       }
 
-      setFeaturedProducts((prev) => [...prev, ...data.data.featuredProducts])
+      // Filter out any products that already exist in the current state
+      const newProducts = data.data.featuredProducts.filter(
+        (newProduct: FeaturedProduct) =>
+          !featuredProducts.some(
+            (existingProduct) => existingProduct._id === newProduct._id
+          )
+      )
+
+      setFeaturedProducts(newProducts)
       setHasMore(pageNum < data.data.pagination.totalPages)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -48,8 +54,10 @@ export function FeaturedProducts() {
   }
 
   useEffect(() => {
-    fetchFeaturedProducts(page)
-  }, [page])
+    if (featuredProducts.length === 0) {
+      fetchFeaturedProducts(1)
+    }
+  }, [])
 
   const loadMore = () => {
     setPage((prev) => prev + 1)
@@ -64,7 +72,10 @@ export function FeaturedProducts() {
   }
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-8 px-16'>
+      {featuredProducts.length > 0 && (
+        <h2 className='text-2xl font-bold pb-4'>Featured Products</h2>
+      )}
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {featuredProducts.map((featured) => (
           <ProductCard key={featured._id} product={featured.productId} />

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowUp, Paperclip, Square, X } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 import Markdown from 'react-markdown'
 
 interface Message {
@@ -158,11 +158,12 @@ export function ProductChat() {
       {!isOpen ? (
         <Button
           onClick={() => setIsOpen(true)}
-          className='bg-purple-600 hover:bg-purple-700'>
-          Dira AI
+          className='bg-white text-primary border-primary border-2 rounded-full px-4 py-2 hover:bg-primary/10 flex items-center gap-2'>
+          <img src='/diravinelogo.png' alt='Dira Logo' className='w-6 h-6' />
+          Chat with Dira!
         </Button>
       ) : (
-        <div className='bg-background border rounded-lg shadow-lg w-[350px] p-4'>
+        <div className='bg-background border rounded-lg shadow-lg w-[600px] p-4'>
           <div className='flex justify-between items-center mb-4'>
             <h3 className='font-semibold'>Dira AI Chat</h3>
             <Button
@@ -188,8 +189,7 @@ export function ProductChat() {
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-100'
                   }`}>
-                 <Markdown>{message.content}</Markdown>
-
+                  <Markdown>{message.content}</Markdown>
                 </div>
               </div>
             ))}

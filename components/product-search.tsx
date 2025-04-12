@@ -22,6 +22,28 @@ export function ProductSearch() {
   const [showResults, setShowResults] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [availableCategories, setAvailableCategories] = useState<string[]>([])
+  const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0)
+
+  const subtitles = [
+    'The marketplace for innovative technology solutions serving the Christian community in Africa',
+    'Guiding Ministries to the Right Tech.',
+    'Your Compass for Faith-Driven Innovation.',
+    'Where African Ministries Discover the Tools to Thrive.',
+    'DiraVine: Pointing Ministries Toward Purposeful Tech.',
+    'Navigate the Future of Ministry with Confidence.',
+    'Your compass to faith driven innovation/solutions',
+    'Pointing Ministries Toward Purposeful Tech',
+    'The Tech Directory Built for Kingdom Impact.',
+    'DiraVine: Direction for Digital Discipleship.',
+  ]
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSubtitleIndex((prevIndex) => (prevIndex + 1) % subtitles.length)
+    }, 10000) // Change subtitle every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Extract unique categories when products are loaded
   useEffect(() => {
@@ -85,10 +107,11 @@ export function ProductSearch() {
           <h1 className='text-4xl font-bold text-primary mb-4'>
             DiraVine Directory
           </h1>
-          <p className='text-lg text-gray-600 mb-8 max-w-2xl mx-auto'>
-            The marketplace for innovative technology solutions serving the
-            Christian community in Africa
-          </p>
+          <div className='min-h-[100px] flex items-center justify-center'>
+            <p className='text-lg text-gray-600 mb-8 max-w-2xl mx-auto transition-opacity duration-1000 ease-in-out'>
+              {subtitles[currentSubtitleIndex]}
+            </p>
+          </div>
 
           {/* Search Bar */}
           <div className='max-w-3xl mx-auto'>

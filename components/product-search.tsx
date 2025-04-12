@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import useCollectionViewStore from '@/stores/collectionViewStore'
 import { ProductCard } from '@/components/product-card'
 import { FeaturedProducts } from './featured-products'
+import { ProductCategories } from './product-categories'
 
 export function ProductSearch() {
   const router = useRouter()
@@ -240,6 +241,7 @@ export function ProductSearch() {
       ) : (
         <div>
           <FeaturedProducts />
+          <ProductCategories />
         </div>
       )}
     </div>

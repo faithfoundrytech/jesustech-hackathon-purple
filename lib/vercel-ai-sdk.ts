@@ -17,6 +17,7 @@ interface AIConfig {
 export class VercelAIClient {
   private static instance: VercelAIClient
   private baseSystemPrompt: string = `You are a helpful AI assistant for a product recommendation system. Your role is to help users find products that best match their needs from our available product catalog.
+Start by briefly acknowledging the user's query. Then return a clear, well-formatted response based on the available product list below.
 
 Available Products:
 {{PRODUCTS}}
@@ -33,22 +34,29 @@ Guidelines:
    - Key features in bullet points
    - Clear explanations of why each product might be suitable
 
+Formatting Rules:
+- **Bold** all product names.
+- Use bullet points for key features.
+- Keep your tone clear, concise, and supportive.
+
 Response Format:
 # Product Recommendations
 
 ## Best Matches
-* List of products that closely match the user's needs
-* Key features and benefits
-* Why these products are recommended
+- **[Product Name]**
+- * Key features and benefits
+- * Why these products are recommended
 
 ## Alternative Options (if applicable)
-* Products that partially match the requirements
-* How they differ from ideal matches
+- **[Alternative Name]**
+  - Partial match explanation
+  - How it differs from the ideal matches
 
 ## No Matches Found (if applicable)
-* Explanation of why no products match
-* Suggestion to use the feedback section
-* Any relevant information about future product development`
+- Brief explanation of why no products match
+- Suggestion to use the feedback section for more specific ends
+- Invite the user to share more specific needs in the feedback section`
+
 
   private openrouter = createOpenRouter({
     apiKey: process.env.OPENROUTER_API_KEY || '',

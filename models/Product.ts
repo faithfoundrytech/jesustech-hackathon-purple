@@ -6,6 +6,7 @@ export interface IProduct extends Document {
   category: string[]
   description: string
   website: string
+  logo?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -31,6 +32,9 @@ const ProductSchema: Schema<IProduct> = new Schema(
     website: {
       type: String,
       required: true,
+    },
+    logo: {
+      type: String,
     },
   },
   {

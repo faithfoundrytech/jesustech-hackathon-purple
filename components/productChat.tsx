@@ -39,6 +39,16 @@ export function ProductChat() {
   useEffect(() => {
     if (isOpen && !chatId) {
       createNewChat()
+      // Add welcome message
+      setMessages([
+        {
+          id: crypto.randomUUID(),
+          content:
+            "Hi, I'm Dira your search assistant here to help you find the right tool, community or opportunity to serve God better! Let me know what you are looking for.",
+          senderType: 'ai',
+          createdAt: new Date(),
+        },
+      ])
     }
   }, [isOpen])
 

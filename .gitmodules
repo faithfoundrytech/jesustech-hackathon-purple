@@ -1,0 +1,3 @@
+[submodule "loveable-dependency"]
+	path = loveable-dependency
+	url = https://github.com/Joylizza/diravine-africa-tech-hub.git

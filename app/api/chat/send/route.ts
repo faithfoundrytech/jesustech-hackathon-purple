@@ -8,12 +8,16 @@ import {
   ChatMessage as AIChatMessage,
 } from '@/lib/vercel-ai-sdk'
 import { logger } from '@/utils/logger'
+import { getAuthenticatedUser } from '@/lib/auth'
 
 export async function POST(request: Request) {
   const context = 'ChatSendAPI'
   try {
     logger.info(context, 'Starting chat message send process')
     await dbConnect()
+
+    // Authenticate user
+    const user = await getAuthenticatedUser()
 
     const { chatId, sessionId, message } = await request.json()
 
@@ -30,10 +34,11 @@ export async function POST(request: Request) {
       )
     }
 
-    // Verify chat exists and belongs to the session
+    // Verify chat exists and belongs to the session and user
     const chat = await Chat.findOne({
       _id: chatId,
       sessionId,
+      userId: user._id,
       status: 'active',
     })
 
@@ -49,8 +54,11 @@ export async function POST(request: Request) {
     }
 
     // Save the user's message
-    logger.debug(context, 'Saving user message')
-    const userMessage = await ChatMessage.create({
+    logger.debug(context, 'Saving user message', {
+      content: message,
+      length: message.length,
+    })
+    await ChatMessage.create({
       chatId: chat._id,
       content: message,
       senderType: 'user',
@@ -100,6 +108,7 @@ export async function POST(request: Request) {
               model: 'openai/chatgpt-4o-latest',
               temperature: 0.7,
               maxTokens: 2000,
+              chatType: chat.chatType, // Pass the chat type to the AI client
             },
             (chunk: string) => {
               fullResponse += chunk
@@ -115,7 +124,13 @@ export async function POST(request: Request) {
           logger.debug(context, 'Saving AI response', {
             responseLength: fullResponse.length,
             processingTime: Date.now() - startTime,
+            content: fullResponse.substring(0, 100) + '...', // Log first 100 chars
           })
+
+          if (!fullResponse.trim()) {
+            logger.error(context, 'Empty AI response received')
+            throw new Error('Empty AI response received')
+          }
 
           await ChatMessage.create({
             chatId: chat._id,
@@ -156,7 +171,7 @@ export async function POST(request: Request) {
         'X-Chat-Id': chat._id?.toString() || '',
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(context, 'Failed to process chat request', error)
     return NextResponse.json(
       {

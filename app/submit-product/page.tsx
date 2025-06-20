@@ -18,6 +18,8 @@ export default function SubmitProduct() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentCategory, setCurrentCategory] = useState('')
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('')
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     country: '',
@@ -29,17 +31,56 @@ export default function SubmitProduct() {
     submitterEmail: '',
   })
 
-  // TODO: Implement form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setMessage('')
+    setMessageType('')
+
     try {
-      // TODO: Add API call to submit product
-      console.log('Submitting product:', formData)
-      // TODO: Add success handling
+      const response = await fetch('/api/submit/product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          country: formData.country,
+          categories: formData.category,
+          description: formData.description,
+          website: formData.website,
+          logo: formData.logo,
+          yourName: formData.submitterName,
+          yourEmail: formData.submitterEmail,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage(
+          'Product submitted successfully! It will be reviewed before being published.'
+        )
+        setMessageType('success')
+        // Reset form
+        setFormData({
+          name: '',
+          country: '',
+          category: [],
+          description: '',
+          website: '',
+          logo: '',
+          submitterName: '',
+          submitterEmail: '',
+        })
+      } else {
+        setMessage(data.error || 'Failed to submit product')
+        setMessageType('error')
+      }
     } catch (error) {
-      // TODO: Add error handling
       console.error('Error submitting product:', error)
+      setMessage('Failed to submit product. Please try again.')
+      setMessageType('error')
     } finally {
       setIsSubmitting(false)
     }
@@ -99,6 +140,18 @@ export default function SubmitProduct() {
       </button>
 
       <h1 className='text-3xl font-bold mb-8'>Submit a Product</h1>
+
+      {message && (
+        <div
+          className={`mb-6 p-4 rounded ${
+            messageType === 'success'
+              ? 'bg-green-100 text-green-700 border border-green-300'
+              : 'bg-red-100 text-red-700 border border-red-300'
+          }`}>
+          {message}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className='space-y-6'>
         <div>
           <label className='block text-sm font-medium mb-2'>Product Name</label>

@@ -7,10 +7,9 @@ import {
   PromptInputTextarea,
 } from '@/components/ui/prompt-input'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Paperclip, Square, X } from 'lucide-react'
+import { ArrowUp, Square, X } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import React from 'react'
-import { createRoot } from 'react-dom/client'
 import Markdown from 'react-markdown'
 
 interface Message {
@@ -20,7 +19,11 @@ interface Message {
   createdAt: Date
 }
 
-export function ProductChat() {
+interface ProductChatProps {
+  chatType?: 'product' | 'opportunity'
+}
+
+export function ProductChat({ chatType = 'product' }: ProductChatProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -110,7 +113,10 @@ export function ProductChat() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to send message')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(
+          errorData.error || `Failed to send message: ${response.status}`
+        )
       }
 
       // Handle streaming response
@@ -149,6 +155,18 @@ export function ProductChat() {
         console.log('Request aborted')
       } else {
         console.error('Error sending message:', error)
+        // Add error message to chat
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            content: `Error: ${
+              error instanceof Error ? error.message : 'Failed to send message'
+            }`,
+            senderType: 'ai',
+            createdAt: new Date(),
+          },
+        ])
       }
     } finally {
       setIsLoading(false)

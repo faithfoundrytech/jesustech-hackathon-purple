@@ -10,12 +10,15 @@ interface ProblemFormData {
   ministry?: string
   categories: string[]
   description: string
+  type: 'problem' | 'job'
 }
 
 export default function SubmitProblem() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentCategory, setCurrentCategory] = useState('')
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('')
   const [formData, setFormData] = useState<ProblemFormData>({
     name: '',
     email: '',
@@ -23,26 +26,68 @@ export default function SubmitProblem() {
     ministry: '',
     categories: [],
     description: '',
+    type: 'problem',
   })
 
-  // TODO: Implement form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setMessage('')
+    setMessageType('')
+
     try {
-      // TODO: Add API call to submit problem
-      console.log('Submitting problem:', formData)
-      // TODO: Add success handling
+      const response = await fetch('/api/submit/opportunity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          country: formData.country,
+          ministry: formData.ministry,
+          categories: formData.categories,
+          description: formData.description,
+          type: formData.type,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage(
+          `${
+            formData.type === 'problem' ? 'Problem' : 'Job'
+          } submitted successfully! It will be reviewed before being published.`
+        )
+        setMessageType('success')
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          country: '',
+          ministry: '',
+          categories: [],
+          description: '',
+          type: 'problem',
+        })
+      } else {
+        setMessage(data.error || `Failed to submit ${formData.type}`)
+        setMessageType('error')
+      }
     } catch (error) {
-      // TODO: Add error handling
-      console.error('Error submitting problem:', error)
+      console.error('Error submitting:', error)
+      setMessage(`Failed to submit ${formData.type}. Please try again.`)
+      setMessageType('error')
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -94,8 +139,33 @@ export default function SubmitProblem() {
         Back
       </button>
 
-      <h1 className='text-3xl font-bold mb-8'>Submit a Problem</h1>
+      <h1 className='text-3xl font-bold mb-8'>Submit an Opportunity </h1>
+
+      {message && (
+        <div
+          className={`mb-6 p-4 rounded ${
+            messageType === 'success'
+              ? 'bg-green-100 text-green-700 border border-green-300'
+              : 'bg-red-100 text-red-700 border border-red-300'
+          }`}>
+          {message}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className='space-y-6'>
+        <div>
+          <label className='block text-sm font-medium mb-2'>Type</label>
+          <select
+            name='type'
+            value={formData.type}
+            onChange={handleChange}
+            required
+            className='w-full p-2 border rounded'>
+            <option value='problem'>Problem</option>
+            <option value='job'>Job Opportunity</option>
+          </select>
+        </div>
+
         <div>
           <label className='block text-sm font-medium mb-2'>Your Name</label>
           <input
@@ -182,7 +252,9 @@ export default function SubmitProblem() {
 
         <div>
           <label className='block text-sm font-medium mb-2'>
-            Problem Description
+            {formData.type === 'problem'
+              ? 'Problem Description'
+              : 'Job Description'}
           </label>
           <textarea
             name='description'
@@ -191,6 +263,11 @@ export default function SubmitProblem() {
             required
             rows={6}
             className='w-full p-2 border rounded'
+            placeholder={
+              formData.type === 'problem'
+                ? 'Describe the problem you need solved in detail...'
+                : 'Describe the job opportunity, requirements, and application process...'
+            }
           />
         </div>
 
@@ -198,7 +275,11 @@ export default function SubmitProblem() {
           type='submit'
           disabled={isSubmitting}
           className='w-full bg-primary text-white py-2 px-4 rounded hover:bg-primary/90 disabled:opacity-50'>
-          {isSubmitting ? 'Submitting...' : 'Submit Problem'}
+          {isSubmitting
+            ? 'Submitting...'
+            : `Submit ${
+                formData.type === 'problem' ? 'Problem' : 'Job Opportunity'
+              }`}
         </button>
       </form>
     </div>

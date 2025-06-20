@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Schema, Document, Model } from 'mongoose'
+import { IUser } from './User'
 
 export interface IProduct extends Document {
   name: string
@@ -7,6 +9,9 @@ export interface IProduct extends Document {
   description: string
   website: string
   logo?: string
+  active?: boolean
+  featured?: boolean
+  submittedBy?: mongoose.Types.ObjectId
   createdAt: Date
   updatedAt: Date
 }
@@ -35,6 +40,18 @@ const ProductSchema: Schema<IProduct> = new Schema(
     },
     logo: {
       type: String,
+    },
+    active: {
+      type: Boolean,
+      default: false,
+    },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
+    submittedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   {

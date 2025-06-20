@@ -1,7 +1,17 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 export default function DiraHeader() {
   const pathname = usePathname()
@@ -33,7 +43,7 @@ export default function DiraHeader() {
             <Link
               href='/'
               className={cn(
-                'text-sm font-medium text-stone-300 hover:text-stone-50 transition-colors',
+                'text-sm font-medium text-stone-500 dark:text-stone-300 hover:text-primary transition-colors',
                 (pathname === '/' ||
                   pathname.includes('/products') ||
                   pathname.includes('/product')) &&
@@ -41,16 +51,52 @@ export default function DiraHeader() {
               )}>
               Products
             </Link>
+            <Link
+              href='/opportunities'
+              className={cn(
+                'text-sm font-medium text-stone-500 dark:text-stone-300 hover:text-primary transition-colors',
+                (pathname === '/opportunities' ||
+                  pathname.includes('/opportunities') ||
+                  pathname.includes('/opportunity')) &&
+                  'text-primary border-b-2 border-primary'
+              )}>
+              Opportunities
+            </Link>
             <button
               disabled
               className='text-sm font-medium text-stone-500 cursor-not-allowed'>
               Communities (Coming Soon)
             </button>
-            <button
-              disabled
-              className='text-sm font-medium text-stone-500 cursor-not-allowed'>
-              Opportunities (Coming Soon)
-            </button>
+          </div>
+
+          {/* Auth Section - Right aligned */}
+          <div className='flex items-center gap-4'>
+            <ThemeSwitcher />
+            <SignedOut>
+              <SignInButton mode='modal'>
+                <button className='text-sm font-medium text-primary hover:text-stone-50 transition-colors px-3 py-1.5 rounded-md border border-primary hover:border-stone-400'>
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton mode='modal'>
+                <button className='text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors px-3 py-1.5 rounded-md'>
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: 'w-8 h-8',
+                    userButtonPopoverCard:
+                      'bg-background border border-stone-600',
+                    userButtonPopoverActionButton:
+                      'text-stone-300 hover:text-stone-50 hover:bg-stone-800',
+                  },
+                }}
+              />
+            </SignedIn>
           </div>
         </div>
       </nav>

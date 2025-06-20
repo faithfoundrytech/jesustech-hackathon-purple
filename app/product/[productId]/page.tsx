@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import Link from 'next/link'
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ProductCard } from '@/components/product-card'
 import useCollectionViewStore from '@/stores/collectionViewStore'
 import DiraHeader from '@/components/dira-header'
+import { toast } from 'sonner'
 
 interface Product {
   _id: string
@@ -19,6 +19,18 @@ interface Product {
   description: string
   website: string
   logo?: string
+  feedback?: {
+    analytics: {
+      upVote: number
+      downVote: number
+      inUse: number
+    }
+    userFeedback?: {
+      upVoted: boolean
+      downVoted: boolean
+      used: boolean
+    }
+  } | null
 }
 
 export default function ProductPage({
@@ -27,12 +39,15 @@ export default function ProductPage({
   params: { productId: string }
 }) {
   const router = useRouter()
-  const { products, getProducts } = useCollectionViewStore()
-  const [product, setProduct] = useState<Product | null>(null)
+  const {
+    products,
+    selectedProduct,
+    setSelectedProduct,
+    getProducts,
+    isLoadingSelectedProduct,
+  } = useCollectionViewStore()
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [upvotes, setUpvotes] = useState(0)
-  const [downvotes, setDownvotes] = useState(0)
-  const [isUsing, setIsUsing] = useState(false)
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false)
 
   useEffect(() => {
     if (!products) {
@@ -41,48 +56,103 @@ export default function ProductPage({
   }, [getProducts, products])
 
   useEffect(() => {
-    if (products && products.length > 0) {
-      const foundProduct = products.find((p) => p._id === params.productId)
-      if (foundProduct) {
-        setProduct(foundProduct)
+    // Set the selected product using the productId from params
+    setSelectedProduct(params.productId)
+  }, [params.productId, setSelectedProduct])
 
-        // Find related products (up to 3) that share at least one category
-        const related = products
-          .filter((p) => p._id !== params.productId)
-          .filter((p) =>
-            p.category.some((cat) => foundProduct.category.includes(cat))
-          )
-          .slice(0, 3)
-        setRelatedProducts(related)
-      }
+  useEffect(() => {
+    if (products && products.length > 0 && selectedProduct) {
+      // Find related products (up to 3) that share at least one category
+      const related = products
+        .filter((p) => p._id !== params.productId)
+        .filter((p) =>
+          p.category.some((cat) => selectedProduct.category.includes(cat))
+        )
+        .slice(0, 3)
+      setRelatedProducts(related)
     }
-  }, [products, params.productId])
+  }, [products, selectedProduct, params.productId])
+
+  const submitFeedback = async (
+    type: 'upvote' | 'downvote' | 'used',
+    added: boolean
+  ) => {
+    try {
+      setIsSubmittingFeedback(true)
+
+      const response = await fetch('/api/products/submit-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: params.productId,
+          type,
+          added,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit feedback')
+      }
+
+      // Refresh the product data to get updated feedback
+      await setSelectedProduct(params.productId)
+
+      toast.success('Feedback submitted successfully!')
+    } catch (error) {
+      console.error('Error submitting feedback:', error)
+      toast.error('Failed to submit feedback', {
+        description:
+          error instanceof Error ? error.message : 'Please try again later',
+      })
+    } finally {
+      setIsSubmittingFeedback(false)
+    }
+  }
 
   const handleUpvote = () => {
-    setUpvotes((prev) => prev + 1)
+    const currentState =
+      selectedProduct?.feedback?.userFeedback?.upVoted || false
+    submitFeedback('upvote', !currentState)
   }
 
   const handleDownvote = () => {
-    setDownvotes((prev) => prev + 1)
+    const currentState =
+      selectedProduct?.feedback?.userFeedback?.downVoted || false
+    submitFeedback('downvote', !currentState)
   }
 
   const handleUseProduct = () => {
-    setIsUsing((prev) => !prev)
+    const currentState = selectedProduct?.feedback?.userFeedback?.used || false
+    submitFeedback('used', !currentState)
   }
 
-  if (!product) {
+  if (isLoadingSelectedProduct || !selectedProduct) {
     return (
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-        <div className='flex items-center justify-center h-96'>
-          <p className='text-gray-500'>Loading product details...</p>
+      <div className='min-h-screen'>
+        <DiraHeader />
+        <div className='h-16' />
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+          <div className='flex items-center justify-center h-96'>
+            <p className='text-gray-500'>Loading product details...</p>
+          </div>
         </div>
       </div>
     )
   }
 
+  const feedback = selectedProduct.feedback
+  const analytics = feedback?.analytics
+  const userFeedback = feedback?.userFeedback
+
   return (
     <div className='min-h-screen'>
       <DiraHeader />
+      <div className='h-16' />
+
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Back Button */}
         <Button
@@ -99,8 +169,8 @@ export default function ProductPage({
             {/* Logo */}
             <div className='relative w-32 h-32 flex-shrink-0'>
               <Image
-                src={product.logo || '/diravinelogo.png'}
-                alt={`${product.name} logo`}
+                src={selectedProduct.logo || '/diravinelogo.png'}
+                alt={`${selectedProduct.name} logo`}
                 fill
                 className='object-contain'
               />
@@ -111,13 +181,15 @@ export default function ProductPage({
               <div className='flex items-center justify-between'>
                 <div>
                   <h1 className='text-3xl font-bold text-gray-900'>
-                    {product.name}
+                    {selectedProduct.name}
                   </h1>
-                  <p className='text-gray-500 mt-1'>{product.country}</p>
+                  <p className='text-gray-500 mt-1'>
+                    {selectedProduct.country}
+                  </p>
                 </div>
                 <Button asChild>
                   <a
-                    href={product.website}
+                    href={selectedProduct.website}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='bg-primary text-white hover:bg-primary/90'>
@@ -128,7 +200,7 @@ export default function ProductPage({
 
               {/* Category Tags */}
               <div className='flex flex-wrap gap-2 mt-4'>
-                {product.category.map((cat) => (
+                {selectedProduct.category.map((cat) => (
                   <Badge key={cat} variant='default'>
                     {cat}
                   </Badge>
@@ -138,28 +210,34 @@ export default function ProductPage({
               {/* Interaction Buttons */}
               <div className='flex items-center gap-4 mt-4'>
                 <Button
-                  variant='outline'
+                  variant={userFeedback?.upVoted ? 'default' : 'outline'}
                   size='sm'
                   onClick={handleUpvote}
+                  disabled={isSubmittingFeedback}
                   className='flex items-center gap-2'>
                   <ThumbsUp className='w-4 h-4' />
-                  <span>{upvotes}</span>
+                  <span>{analytics?.upVote || 0}</span>
                 </Button>
                 <Button
-                  variant='outline'
+                  variant={userFeedback?.downVoted ? 'default' : 'outline'}
                   size='sm'
                   onClick={handleDownvote}
+                  disabled={isSubmittingFeedback}
                   className='flex items-center gap-2'>
                   <ThumbsDown className='w-4 h-4' />
-                  <span>{downvotes}</span>
+                  <span>{analytics?.downVote || 0}</span>
                 </Button>
                 <Button
-                  variant={isUsing ? 'default' : 'outline'}
+                  variant={userFeedback?.used ? 'default' : 'outline'}
                   size='sm'
                   onClick={handleUseProduct}
+                  disabled={isSubmittingFeedback}
                   className='flex items-center gap-2'>
                   <CheckCircle className='w-4 h-4' />
-                  <span>{isUsing ? 'Using' : 'I use this'}</span>
+                  <span>
+                    {userFeedback?.used ? 'Using' : 'I use this'} (
+                    {analytics?.inUse || 0})
+                  </span>
                 </Button>
               </div>
 
@@ -169,7 +247,7 @@ export default function ProductPage({
                   About
                 </h2>
                 <p className='text-gray-600 whitespace-pre-line'>
-                  {product.description}
+                  {selectedProduct.description}
                 </p>
               </div>
             </div>

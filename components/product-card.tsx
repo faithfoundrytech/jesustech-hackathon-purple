@@ -1,9 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import useCollectionViewStore from '@/stores/collectionViewStore'
 
 interface ProductCardProps {
   product: {
@@ -18,6 +19,16 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter()
+  const { setSelectedProduct } = useCollectionViewStore()
+
+  const handleViewProduct = async () => {
+    // Set the current product in the store before navigating
+    // Pass the product ID so the store can fetch complete product data with feedback
+    await setSelectedProduct(product._id)
+    router.push(`/product/${product._id}`)
+  }
+
   return (
     <div className='bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200'>
       <div className='flex items-start gap-4'>
@@ -50,8 +61,8 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button
               variant='link'
               className='text-primary hover:text-primary/80'
-              asChild>
-              <Link href={`/product/${product._id}`}>View Product</Link>
+              onClick={handleViewProduct}>
+              View Product
             </Button>
             <Button
               variant='link'

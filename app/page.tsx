@@ -18,6 +18,8 @@ export default function Home() {
   return (
     <div className='min-h-screen'>
       <DiraHeader />
+      <div className='h-16' />
+
       <div className='relative'>
         <ProductSearch />
         <div className='fixed bottom-4 right-4 z-50'>

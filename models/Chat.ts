@@ -3,6 +3,8 @@ import mongoose, { Schema, Document, Model } from 'mongoose'
 export interface IChat extends Document {
   name: string // AI-generated summary name
   sessionId: string // The session ID for the specific user
+  userId?: mongoose.Types.ObjectId // The authenticated user
+  chatType?: 'product' | 'opportunity' // Type of chat for data context
   status: 'active' | 'archived' | 'deleted'
   lastMessageAt: Date
   messageCount: number
@@ -15,6 +17,12 @@ const ChatSchema: Schema<IChat> = new Schema(
   {
     name: { type: String, required: true },
     sessionId: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    chatType: {
+      type: String,
+      enum: ['product', 'opportunity'],
+      default: 'product',
+    },
     status: {
       type: String,
       enum: ['active', 'archived', 'deleted'],
